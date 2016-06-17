@@ -76,43 +76,46 @@ FitCF::FitCF(particle_info* all_particles_in, int Nparticle_in, int particle_idx
 	use_delta_f = true;
 	no_df_stem = "";
 
-	thermal_target_dN_dypTdpTdphi_moments = new double ****** [n_interp_pT_pts];
-	current_dN_dypTdpTdphi_moments = new double ****** [n_interp_pT_pts];
+	/*thermal_target_dN_dypTdpTdphi_moments = new double ****** [n_interp_pT_pts];
+	full_target_dN_dypTdpTdphi_moments = new double ****** [n_interp_pT_pts];
 	for (int ipt = 0; ipt < n_interp_pT_pts; ++ipt)
 	{
 		thermal_target_dN_dypTdpTdphi_moments[ipt] = new double ***** [n_interp_pphi_pts];
-		current_dN_dypTdpTdphi_moments[ipt] = new double ***** [n_interp_pphi_pts];
+		full_target_dN_dypTdpTdphi_moments[ipt] = new double ***** [n_interp_pphi_pts];
 		for (int ipphi = 0; ipphi < n_interp_pphi_pts; ++ipphi)
 		{
 			thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi] = new double **** [qtnpts];
-			current_dN_dypTdpTdphi_moments[ipt][ipphi] = new double **** [qtnpts];
+			full_target_dN_dypTdpTdphi_moments[ipt][ipphi] = new double **** [qtnpts];
 			for (int iqt = 0; iqt < qtnpts; ++iqt)
 			{
 				thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt] = new double *** [qxnpts];
-				current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt] = new double *** [qxnpts];
+				full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt] = new double *** [qxnpts];
 				for (int iqx = 0; iqx < qxnpts; ++iqx)
 				{
 					thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx] = new double ** [qynpts];
-					current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx] = new double ** [qynpts];
+					full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx] = new double ** [qynpts];
 					for (int iqy = 0; iqy < qynpts; ++iqy)
 					{
 						thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy] = new double * [qznpts];
-						current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy] = new double * [qznpts];
+						full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy] = new double * [qznpts];
 						for (int iqz = 0; iqz < qznpts; ++iqz)
 						{
 							thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz] = new double [2];
-							current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz] = new double [2];
+							full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz] = new double [2];
 							for (int itrig = 0; itrig < 2; ++itrig)
 							{
 								thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][itrig] = 0.0;
-								current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][itrig] = 0.0;
+								full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][itrig] = 0.0;
 							}
 						}
 					}
 				}
 			}
 		}
-	}
+	}*/
+
+	thermal_target_dN_dypTdpTdphi_moments = new double [n_interp_pT_pts * n_interp_pphi_pts * qtnpts * qxnpts * qynpts * qznpts * ntrig];
+	full_target_dN_dypTdpTdphi_moments = new double [n_interp_pT_pts * n_interp_pphi_pts * qtnpts * qxnpts * qynpts * qznpts * ntrig];
 
 	int qidx = 0;
 	qlist = new double * [qtnpts*qxnpts*qynpts*qznpts];

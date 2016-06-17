@@ -11,6 +11,13 @@
 
 using namespace std;
 
+inline int FitCF::indexer(const int ipt, const int ipphi, const int iqt, const int iqx, const int iqy, const int iqz, const int itrig)
+{
+	return (
+		( ( ( ( ( ipt * n_interp_pphi_pts + ipphi ) * qtnpts + iqt ) * qxnpts + iqx ) * qynpts + iqy ) * qznpts + iqz ) * 2 + itrig
+	);
+}
+
 inline double FitCF::lin_int(double x_m_x1, double one_by_x2_m_x1, double f1, double f2)
 {
 	return ( f1 + (f2 - f1) * x_m_x1 * one_by_x2_m_x1 );

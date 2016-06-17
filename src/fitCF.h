@@ -76,9 +76,11 @@ class FitCF
 		double ** current_q_space_cutoff;	// point in q-space at which cutoff of CF begins (depends on pT and pphi)
 						
 		//arrays to hold results of resonance phase-space integrations
-		double ******* thermal_target_dN_dypTdpTdphi_moments;
-		double ******* full_target_dN_dypTdpTdphi_moments;
-		double ******* current_dN_dypTdpTdphi_moments;
+		//double ******* thermal_target_dN_dypTdpTdphi_moments;
+		//double ******* full_target_dN_dypTdpTdphi_moments;
+		//double ******* current_dN_dypTdpTdphi_moments;
+		double * thermal_target_dN_dypTdpTdphi_moments;
+		double * full_target_dN_dypTdpTdphi_moments;
 
 		double ***** target_pphiavgd_CFs;
 		double ***** target_pphivar_CFs;
@@ -139,6 +141,7 @@ class FitCF
 		string no_df_stem;
 
 	public:
+		inline int indexer(const int ipt, const int ipphi, const int iqt, const int iqx, const int iqy, const int iqz, const int itrig);
 		inline double lin_int(double x_m_x1, double one_by_x2_m_x1, double f1, double f2);
 		bool fexists(const char *filename);
 

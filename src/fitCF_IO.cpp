@@ -313,16 +313,20 @@ void FitCF::Readin_total_target_eiqx_dN_dypTdpTdphi(int folderindex)
 		//spectra[target_particle_id][ipt][ipphi] += dummy;
 		temp_spectra[ipt * n_interp_pphi_pts + ipphi] = dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
-		current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0] += dummy;
+		//full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0] += dummy;
+		full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)] += dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
-		current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1] += dummy;
+		//full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1] += dummy;
+		full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)] += dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
 		//thermal_spectra[target_particle_id][ipt][ipphi] += dummy;
 		temp_thermal_spectra[ipt * n_interp_pphi_pts + ipphi] = dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
-		thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0] += dummy;
+		//thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0] += dummy;
+		thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)] += dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
-		thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1] += dummy;
+		//thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1] += dummy;
+		thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)] += dummy;
 		//actually finish reading stuff here
 		input_target_dN_dypTdpTdphi >> dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
@@ -330,14 +334,19 @@ void FitCF::Readin_total_target_eiqx_dN_dypTdpTdphi(int folderindex)
 		input_target_dN_dypTdpTdphi >> dummy;
 		input_target_dN_dypTdpTdphi >> dummy;
 
-		/*//thermal
+		/*
+		//thermal
 		double nonFTd_tspectra = thermal_spectra[target_particle_id][ipt][ipphi];
-		double cos_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0];
-		double sin_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1];
+		//double cos_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0];
+		//double sin_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1];
+		double cos_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)];
+		double sin_transf_tspectra = thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)];
 		//total
 		double nonFTd_spectra = spectra[target_particle_id][ipt][ipphi];
-		double cos_transf_spectra = current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0];
-		double sin_transf_spectra = current_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1];
+		//double cos_transf_spectra = full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][0];
+		//double sin_transf_spectra = full_target_dN_dypTdpTdphi_moments[ipt][ipphi][iqt][iqx][iqy][iqz][1];
+		double cos_transf_spectra = full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)];
+		double sin_transf_spectra = full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)];
 
 		if (FIT_WITH_PROJECTED_CFVALS && !thermal_pions_only)
 		{
@@ -348,7 +357,8 @@ void FitCF::Readin_total_target_eiqx_dN_dypTdpTdphi(int folderindex)
 
 		cout << "CHECK (" << ipt << ", " << ipphi << ", " << iqt << ", " << iqx << ", " << iqy << ", " << iqz << "): "
 				<< fraction_of_resonances << "   " << nonFTd_tspectra << "   " << cos_transf_tspectra << "   " << sin_transf_tspectra << "   "
-				<< nonFTd_spectra << "   " << cos_transf_spectra << "   " << sin_transf_spectra << endl;*/
+				<< nonFTd_spectra << "   " << cos_transf_spectra << "   " << sin_transf_spectra << endl;
+		*/
 	}
 
 	for (int ipt = 0; ipt < n_interp_pT_pts; ++ipt)
