@@ -111,6 +111,8 @@ int main(int argc, char *argv[])
 
 	//output results
 	//fit_CF.Output_correlationfunction();
+	if (argc == 3)	//for ensemble averaging, save average FT spectra to file
+		fit_CF.Output_total_target_eiqx_dN_dypTdpTdphi();
 
 	output << "Finished calculating correlation function with all resonance decays..." << endl;
 

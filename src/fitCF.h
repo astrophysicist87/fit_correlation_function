@@ -201,7 +201,7 @@ class FitCF
 
 		// input and output function prototypes
 		void Readin_total_target_eiqx_dN_dypTdpTdphi(int folderindex);
-		void Output_total_eiqx_dN_dypTdpTdphi(int local_pid);
+		void Output_total_target_eiqx_dN_dypTdpTdphi();
 		void Output_results(int mode);
 		void Readin_results(int mode);
 		void Read_in_all_dN_dypTdpTdphi();

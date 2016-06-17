@@ -390,5 +390,72 @@ void FitCF::Readin_resonance_fraction(int folderindex)
 	return;
 }
 
+void FitCF::Output_total_target_eiqx_dN_dypTdpTdphi()
+{
+	string local_name = all_particles[target_particle_id].name;
+	replace_parentheses(local_name);
+	ostringstream filename_stream_target_dN_dypTdpTdphi;
+	filename_stream_target_dN_dypTdpTdphi << global_path << "/total_" << local_name << "_eiqx_dN_dypTdpTdphi_evavg" << no_df_stem << ".dat";
+	ofstream output_target_dN_dypTdpTdphi(filename_stream_target_dN_dypTdpTdphi.str().c_str());
+
+	// addresses NaN issue in sin component when all q^{\mu} == 0
+	if (qtnpts%2==1 && qxnpts%2==1 && qynpts%2==1 && qznpts%2==1)
+	{	//if all q-ranges are odd and centered on q=0 ==> q=0 is included!
+		int iqt0 = (qtnpts-1)/2;
+		int iqx0 = (qxnpts-1)/2;
+		int iqy0 = (qynpts-1)/2;
+		int iqz0 = (qznpts-1)/2;
+		for (int ipt = 0; ipt < n_interp_pT_pts; ++ipt)
+		for (int ipphi = 0; ipphi < n_interp_pphi_pts; ++ipphi)
+		{
+			full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt0, iqx0, iqy0, iqz0, 1)] = 0.0;
+			thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt0, iqx0, iqy0, iqz0, 1)] = 0.0;
+		}
+	}
+
+	//use this to help look for outliers when CF calculation gets really choppy and noisy
+	//Set_target_pphiavgd_CFs();
+
+	for (int iqt = 0; iqt < qtnpts; ++iqt)
+	for (int iqx = 0; iqx < qxnpts; ++iqx)
+	for (int iqy = 0; iqy < qynpts; ++iqy)
+	for (int iqz = 0; iqz < qznpts; ++iqz)
+	for (int ipt = 0; ipt < n_interp_pT_pts; ++ipt)
+	for (int ipphi = 0; ipphi < n_interp_pphi_pts; ++ipphi)
+	{
+		//first, get CF and projected CF
+		double CF = get_CF(ipt, ipphi, iqt, iqx, iqy, iqz, false);				//false means don't return projected value
+		//double projected_CF = get_CF(ipt, ipphi, iqt, iqx, iqy, iqz, true && !thermal_pions_only);	//true means do return projected value
+
+		//now, regulate results
+		//Regulate_CF(ipt, iqt, iqx, iqy, iqz, &CF, &projected_CF);
+
+		//!!!!!!!!!!!!should get projected_CF AFTER regulating CF...!!!!!!!!!!!!
+		double projected_CF = get_CF(ipt, ipphi, iqt, iqx, iqy, iqz, true && !thermal_pions_only);	//true means do return projected value
+
+		double nonFTd_spectra = spectra[target_particle_id][ipt][ipphi];
+		double cos_transf_spectra = full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)];
+		double sin_transf_spectra = full_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)];
+
+		output_target_dN_dypTdpTdphi << scientific << setprecision(8) << setw(12)
+			<< qt_pts[iqt] << "   " << qx_pts[iqx] << "   " << qy_pts[iqy] << "   " << qz_pts[iqz] << "   "
+			<< SPinterp_pT[ipt] << "   " << SPinterp_pphi[ipphi] << "   "
+			<< nonFTd_spectra << "   "																								//non-thermal + thermal
+			<< cos_transf_spectra << "   "																							//non-thermal + thermal (cos)
+			<< sin_transf_spectra << "   "																							//non-thermal + thermal (sin)
+			<< thermal_spectra[target_particle_id][ipt][ipphi] << "   "																//thermal only
+			<< thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)] << "   "							//thermal only (cos)
+			<< thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)] << "   "							//thermal only (sin)
+			<< nonFTd_spectra - thermal_spectra[target_particle_id][ipt][ipphi] << "   "											//non-thermal only
+			<< cos_transf_spectra - thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 0)] << "   "		//non-thermal only (cos)
+			<< sin_transf_spectra - thermal_target_dN_dypTdpTdphi_moments[indexer(ipt, ipphi, iqt, iqx, iqy, iqz, 1)] << "   "		//non-thermal only (sin)
+			<< CF << "   " << projected_CF << endl;
+	}
+
+	output_target_dN_dypTdpTdphi.close();
+
+	return;
+}
+
 
 //End of file
