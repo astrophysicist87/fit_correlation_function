@@ -143,6 +143,8 @@ class FitCF
 	public:
 		inline int indexer(const int ipt, const int ipphi, const int iqt, const int iqx, const int iqy, const int iqz, const int itrig);
 		inline double lin_int(double x_m_x1, double one_by_x2_m_x1, double f1, double f2);
+
+		void replace_parentheses(std::string & tempstring);
 		bool fexists(const char *filename);
 
 		void Regulate_CF(int ipt, int iqt, int iqx, int iqy, int iqz, double * CF, double * projCF);

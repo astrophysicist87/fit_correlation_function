@@ -64,14 +64,61 @@ void FitCF::Cal_correlationfunction()
 	if (qtnpts == 1)
 		return;
 
+	////////////////////////////////////////////////////////////
+	//reading in events...
 	for (int iEvent = 0; iEvent < nEvents; ++iEvent)
 	{
 		*global_out_stream_ptr << "Reading in event = " << chosen_events[iEvent] << endl;
+
+		//construct needed filename
+		string resultsDirectory = "";
+		if (currentfolderindex == -1)
+			resultsDirectory = "/results-" + patch::to_string(chosen_events[iEvent]);
+		string local_name = all_particles[target_particle_id].name;
+		replace_parentheses(local_name);
+		ostringstream filename_stream_target_dN_dypTdpTdphi;
+		filename_stream_target_dN_dypTdpTdphi << global_path << resultsDirectory
+					<< "/total_" << local_name << "_eiqx_dN_dypTdpTdphi_ev" << chosen_events[iEvent] << no_df_stem << ".dat";
+
+		//now check if file exists
+		bool file_exists = fexists(filename_stream_target_dN_dypTdpTdphi.str().c_str());
+
+		//if not, unzip from zip file first, then remove when done
+		if (not file_exists)
+		{
+			ostringstream local_cmd;
+			//need to change directories if actually in a results directory...
+			if (currentfolderindex != -1)
+				local_cmd << "cd ..; ";
+			//...unzip...
+			local_cmd << "unzip FTresults.zip results-" << chosen_events[iEvent]
+						<< "/total_" << local_name << "_eiqx_dN_dypTdpTdphi_ev" << chosen_events[iEvent] << no_df_stem << ".dat; ";
+			//...then change back
+			if (currentfolderindex != -1)
+				local_cmd << "cd " << global_path;
+
+			//now submit the full command
+			*global_out_stream_ptr << "    --> Running this command: " << local_cmd.str().c_str() << endl;
+			int cmd_result = system(local_cmd.str().c_str());
+		}
+
+		//now read the file in and average appropriately
 		Readin_resonance_fraction(chosen_events[iEvent]);
 		Readin_total_target_eiqx_dN_dypTdpTdphi(chosen_events[iEvent]);
+
+		//delete file, as promised
+		if (not file_exists)
+		{
+			ostringstream local_cmd;
+			local_cmd << "/bin/rm " << filename_stream_target_dN_dypTdpTdphi.str();
+			*global_out_stream_ptr << "    --> Running this command: " << local_cmd.str().c_str() << endl;
+			int cmd_result = system(local_cmd.str().c_str());
+		}
+
 	}
 
 	Average_total_target_eiqx_dN_dypTdpTdphi();	//if nEvents=1, does nothing
+	////////////////////////////////////////////////////////////////////////
 
 	//now that we have the spectra (averaged or not), the rest of the calculation is the same
 
