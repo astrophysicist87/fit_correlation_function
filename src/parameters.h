@@ -17,16 +17,15 @@ using namespace std;
 #define QX_POINTS_SPACING				0
 #define QY_POINTS_SPACING				0
 #define QZ_POINTS_SPACING				0
-//#define VARY_ALPHA					false		// (not yet implemented) feature to treat power in exponential as a fit variable (alpha == 2 <==> traditional Gaussian)
 #define Q_AXES_AND_RAYS_ONLY			false		// true - only do points along q-axes (only works for odd points right now)
 													// false - do full grid
 #define FIT_WITH_PROJECTED_CFVALS		true		// as opposed to unprojected CFvals...
-#define FLESH_OUT_CF					false		// refines grid via interpolation before fitting
+#define FLESH_OUT_CF					true		// refines grid via interpolation before fitting
 #define REGULATE_CF						false		// true (false) means (don't) try to catch spurious values of projected
 													// or regular CF and replace them with median value in that window
 #define SLICE_OF_FLESH_ONLY				true		// full correlation function (fleshed out) is typically a HUGE file (~10GB),
 													// so use this to output q-slices only (MUCH) smaller
-
+#define THERMAL_ONLY					false		// duh
 
 
 
@@ -85,9 +84,9 @@ const int new_nqzpts = new_nqpts;
 //const int qznpts = 7;
 //try to make max. sqrt(q dot q) ~ 0.025 GeV or so
 const double delta_qt = 0.00625;
-const double delta_qx = 0.0125;
-const double delta_qy = 0.0125;
-const double delta_qz = 0.015;
+const double delta_qx = 0.025;
+const double delta_qy = 0.025;
+const double delta_qz = 0.0125;
 //const double delta_qx = 0.003;
 //const double delta_qy = 0.003;
 //const double delta_qz = 0.003;

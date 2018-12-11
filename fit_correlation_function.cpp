@@ -29,14 +29,38 @@ int main(int argc, char *argv[])
 	sw.tic();
 
 	//check if proper number of command-line arguments were passed
-	if (argc != 1 && argc != 3)
+	if (argc != 1 and argc != 3 and argc != 4)
 	{
 		cerr << "You passed the wrong number of parameters to fit_correlation_function()!  Exiting..." << endl;
 		exit(1);
 	}
 
 	bool generatedcorrfuncs = false;
-	string currentworkingdirectory = get_selfpath();
+	string currentworkingdirectory = "";
+
+	//defines events to include in ensemble average
+	//handles single event automatically
+	vector<int> chosen_events;
+	int lower_limit = -1;
+	int upper_limit = -1;
+	if (argc == 1)	//if no CMD args passed, assume we're in a specific directory
+	{
+		int folderindex = get_folder_index(currentworkingdirectory);
+		lower_limit = folderindex;
+		upper_limit = folderindex;
+		currentworkingdirectory = get_selfpath();
+	}
+	else if (argc == 3)
+	{
+		lower_limit = atoi(argv[1]);
+		upper_limit = atoi(argv[2]);
+	}
+	else if (argc == 4)
+	{
+		lower_limit = atoi(argv[1]);
+		upper_limit = atoi(argv[2]);
+		currentworkingdirectory = argv[3];
+	}
 
 	initialize_PRfile(currentworkingdirectory);
 
@@ -65,22 +89,6 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	//defines events to include in ensemble average
-	//handles single event automatically
-	vector<int> chosen_events;
-	int lower_limit = -1;
-	int upper_limit = -1;
-	if (argc == 1)	//if no CMD args passed, assume we're in a specific directory
-	{
-		int folderindex = get_folder_index(currentworkingdirectory);
-		lower_limit = folderindex;
-		upper_limit = folderindex;
-	}
-	else if (argc == 3)
-	{
-		lower_limit = atoi(argv[1]);
-		upper_limit = atoi(argv[2]);
-	}
 	for (int i = lower_limit; i <= upper_limit; ++i)	//set chosen_events from command line
 		chosen_events.push_back(i);
 
@@ -91,12 +99,13 @@ int main(int argc, char *argv[])
 
 	//read in gridsize from file for now...
 	int gridsizes[6];
-	ifstream inputGridSizes("./gridsizes.dat");
+	ifstream inputGridSizes("./gridsizes.params");
 	for (int igs = 0; igs < 6; ++igs)
-		inputGridSizes >> gridsizes[igs];
+	inputGridSizes >> gridsizes[igs];
 	inputGridSizes.close();
 
-	FitCF fit_CF(particle, Nparticle, particle_idx, chosen_events, output, gridsizes[0], gridsizes[1], gridsizes[2], gridsizes[3], gridsizes[4], gridsizes[5]);
+	FitCF fit_CF(particle, Nparticle, particle_idx, chosen_events, output,
+					gridsizes[0], gridsizes[1], gridsizes[2], gridsizes[3], gridsizes[4], gridsizes[5]);
 
 	//fit_CF.read_in_all_dN_dypTdpTdphi = false;
 	//fit_CF.output_all_dN_dypTdpTdphi = !(fit_CF.read_in_all_dN_dypTdpTdphi);
@@ -107,34 +116,40 @@ int main(int argc, char *argv[])
 	if (argc == 1)
 		fit_CF.currentfolderindex = get_folder_index(currentworkingdirectory);
 		//if no CMD args passed, assume we're actually in the folder
+	else if ((int)chosen_events.size() == 1)
+		fit_CF.currentfolderindex = lower_limit;	// == upper_limit
+
+	output << "Currently have fit_CF.currentfolderindex = " << fit_CF.currentfolderindex << endl;
 
 	////////////////////////////////////////////
 	// Actual calculations start here...
 	////////////////////////////////////////////
 
-	output << "Calculating correlation function with all resonance decays..." << endl;
-	//do calculations
-	fit_CF.Cal_correlationfunction();	//if we didn't compute resonance decays, must read them in from files
-
-	//output results
-	fit_CF.Output_averaged_correlationfunction();
-	//if (argc == 3)	//for ensemble averaging, save average FT spectra to file
-	//	fit_CF.Output_total_target_eiqx_dN_dypTdpTdphi();
-
-	output << "Finished calculating correlation function with all resonance decays..." << endl;
-
-//if (1) exit (8);
-
-	//if there's a full 3D grid to fit over, do the Gaussian fit and get the HBT radii too
-	if (gridsizes[3] > 1 && gridsizes[4] > 1 && gridsizes[5] > 1)
+	bool get_radii_and_average_CF = false;
+	if (get_radii_and_average_CF)
 	{
-		output << "Calculating HBT radii via Gaussian fit method..." << endl;
-		fit_CF.Get_GF_HBTradii();
-		fit_CF.Output_results(0);	//0 means do GF R2ij
-		fit_CF.Output_lambdas();	//don't forget these!
-		output << "Finished calculating HBT radii via Gaussian fit method" << endl;
+		output << "Calculating correlation function with all resonance decays..." << endl;
+		//do calculations
+		fit_CF.Cal_correlationfunction();	//if we didn't compute resonance decays, must read them in from files
+
+		//output results
+		fit_CF.Output_averaged_correlationfunction();
+
+		output << "Finished calculating correlation function with all resonance decays..." << endl;
+
+		//if there's a full 3D grid to fit over, do the Gaussian fit and get the HBT radii too
+		if (gridsizes[3] > 1 && gridsizes[4] > 1 && gridsizes[5] > 1)
+		{
+			output << "Calculating HBT radii via Gaussian fit method..." << endl;
+			fit_CF.Get_GF_HBTradii();
+			fit_CF.Output_results(0);	//0 means do GF R2ij
+			fit_CF.Output_lambdas();	//don't forget these!
+			output << "Finished calculating HBT radii via Gaussian fit method" << endl;
+		}
 	}
-	/*if (FLESH_OUT_CF)
+
+	//do fleshing out
+	if (FLESH_OUT_CF)
 	{
 		output << "Allocating fleshed out CFvals..." << endl;
 		fit_CF.Allocate_fleshed_out_CF();
@@ -146,7 +161,7 @@ int main(int argc, char *argv[])
 			fit_CF.Output_fleshed_out_correlationfunction(ipt, ipphi);
 		}
 		fit_CF.Delete_fleshed_out_CF();
-	}*/
+	}
 
 	sw.toc();
 	output << "Finished in " << sw.takeTime() << " sec." << endl;
